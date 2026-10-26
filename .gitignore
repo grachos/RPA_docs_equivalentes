@@ -1,0 +1,13 @@
+.env
+*.har
+state.db
+downloads/
+debug/
+logs/
+reports/
+.browser_profile/
+__pycache__/
+.pytest_cache/
+*.xlsx
+state.db.bak*
+.app.lock
