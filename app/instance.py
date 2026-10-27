@@ -46,7 +46,7 @@ def close_orphan_browsers(profile_dir: Path = config.BROWSER_PROFILE_DIR) -> int
         return 0
     marker = str(profile_dir).replace("'", "''")
     script = (
-        "$p = Get-CimInstance Win32_Process -Filter \"Name='chrome.exe'\" | "
+        "$p = Get-CimInstance Win32_Process -Filter \"Name='chrome.exe' OR Name='msedge.exe'\" | "
         f"Where-Object {{ $_.CommandLine -like '*{marker}*' }}; "
         "$p | ForEach-Object { Stop-Process -Id $_.ProcessId -Force -ErrorAction SilentlyContinue }; "
         "($p | Measure-Object).Count"

@@ -22,7 +22,8 @@ class SettingsTabMixin:
                                                          pady=(10, 4), sticky="w")
         labels = {"MYE_USER": "Usuario MyE-invoice", "MYE_PASSWORD": "Contraseña MyE-invoice",
                   "CADI_DOCUMENT": "Documento CADI", "CADI_PASSWORD": "Contraseña CADI",
-                  "TERCEROS_API_KEY": "API KEY de terceros"}
+                  "TERCEROS_API_KEY": "API KEY de terceros",
+                  "CADI_REVIEWER": "Revisor CADI (cédula - NOMBRE)"}
         self.cred_status: dict[str, ctk.CTkLabel] = {}
         for i, name in enumerate(config.CREDENTIAL_NAMES, start=1):
             ctk.CTkLabel(creds, text=labels[name], width=200, anchor="w").grid(row=i, column=0, padx=12, pady=4)

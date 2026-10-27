@@ -87,9 +87,10 @@ class BrowserWorker:
         return self._ctx.pages[0] if self._ctx.pages else self._ctx.new_page()
 
     def _launch(self):
+        extra = {"channel": config.BROWSER_CHANNEL} if config.BROWSER_CHANNEL else {}
         return self._pw.chromium.launch_persistent_context(
             str(config.BROWSER_PROFILE_DIR), headless=False, no_viewport=True,
-            args=["--start-maximized"], accept_downloads=True)
+            args=["--start-maximized"], accept_downloads=True, **extra)
 
     def _close_browser(self) -> None:
         for closer in (lambda: self._ctx and self._ctx.close(), lambda: self._pw and self._pw.stop()):

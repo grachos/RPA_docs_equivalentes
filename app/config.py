@@ -6,11 +6,18 @@ if missing there, from Windows Credential Manager via `keyring`.
 from __future__ import annotations
 
 import os
+import sys
 from pathlib import Path
 
 from dotenv import load_dotenv
 
-BASE_DIR = Path(__file__).resolve().parent.parent
+FROZEN = bool(getattr(sys, "frozen", False))  # running as the PyInstaller .exe
+if FROZEN:
+    # Each user keeps their own data (credentials, state, browser profile) outside the .exe.
+    BASE_DIR = Path(os.getenv("LOCALAPPDATA") or Path.home()) / "DocumentoSoporteAutomatico"
+    BASE_DIR.mkdir(parents=True, exist_ok=True)
+else:
+    BASE_DIR = Path(__file__).resolve().parent.parent
 ENV_PATH = BASE_DIR / ".env"
 load_dotenv(ENV_PATH)
 
@@ -27,6 +34,8 @@ DEBUG_DIR = BASE_DIR / "debug"
 LOGS_DIR = BASE_DIR / "logs"
 REPORTS_DIR = BASE_DIR / "reports"
 BROWSER_PROFILE_DIR = BASE_DIR / ".browser_profile"
+# The .exe has no bundled Chromium: it drives the Microsoft Edge that ships with Windows.
+BROWSER_CHANNEL = os.getenv("BROWSER_CHANNEL") or ("msedge" if FROZEN else None)
 
 # --- Sites -----------------------------------------------------------------
 MYE_LOGIN_URL = "https://portal.myeinvoice.co/CompunetWebService/interfaces/inicio.jsp"
@@ -87,7 +96,8 @@ PROTECTED_CADI_IDS = frozenset({"233998", "234004"})
 
 # --- Credentials -------------------------------------------------------------
 KEYRING_SERVICE = "doc-soporte-auto"
-CREDENTIAL_NAMES = ("MYE_USER", "MYE_PASSWORD", "CADI_DOCUMENT", "CADI_PASSWORD", "TERCEROS_API_KEY")
+CREDENTIAL_NAMES = ("MYE_USER", "MYE_PASSWORD", "CADI_DOCUMENT", "CADI_PASSWORD", "TERCEROS_API_KEY",
+                    "CADI_REVIEWER")
 
 # Silogtran "terceros" API: address/identification of providers missing data in MyE.
 TERCEROS_API_URL = os.getenv("TERCEROS_API_URL", "https://apis-legalizacion-silogtran.onrender.com")
@@ -105,6 +115,8 @@ def save_credential(name: str, value: str, env_path: Path | None = None) -> Path
     path.touch(exist_ok=True)
     set_key(path, name, value, quote_mode="always")
     os.environ[name] = value
+    if name == "CADI_REVIEWER":  # a constant read at import: refresh it so no restart is needed
+        globals()["CADI_REVIEWER"] = value
     return path
 
 

@@ -11,3 +11,6 @@ __pycache__/
 *.xlsx
 state.db.bak*
 .app.lock
+build/
+dist/
+*.spec
